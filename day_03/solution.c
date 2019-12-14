@@ -21,31 +21,47 @@ int pair_in_list(int *list, int n, int x, int y) {
 
 
 int main() {
-	int x = 0;
-	int y = 0;
-	int cap = 2048;
-	int *visited = realloc_or_die(NULL, cap * 2);
-	int n_visited = 0;
+	int x[] = {0, 0, 0};
+	int y[] = {0, 0, 0};
+	int cap_santa = 2048;
+	int cap_both = 2048;
+	int *santa = realloc_or_die(NULL, cap_santa * 2);
+	int *both = realloc_or_die(NULL, cap_both * 2);
+	int n_santa = 0;
+	int n_both = 0;
 	int done = 0;
+	int i = 0;
 	while (!done) {
 		switch (getchar()) {
-			case '<': x--; break;
-			case '>': x++; break;
-			case 'v': y--; break;
-			case '^': y++; break;
+			case '<': x[2]--; x[i%2]--; break;
+			case '>': x[2]++; x[i%2]++; break;
+			case 'v': y[2]--; y[i%2]--; break;
+			case '^': y[2]++; y[i%2]++; break;
 			case EOF: done = 1; break;
 		}
-		if (!pair_in_list(visited, n_visited, x, y)) {
-			if (n_visited >= cap - 1) {
-				cap *= 2;
-				visited = realloc_or_die(visited, cap * 2);
+		if (!pair_in_list(santa, n_santa, x[2], y[2])) {
+			if (n_santa >= cap_santa - 1) {
+				cap_santa *= 2;
+				santa = realloc_or_die(santa, cap_santa * 2);
 			}
-			visited[n_visited * 2] = x;
-			visited[n_visited * 2 + 1] = y;
-			n_visited++;
+			santa[n_santa * 2] = x[2];
+			santa[n_santa * 2 + 1] = y[2];
+			n_santa++;
 		}
+		if (!pair_in_list(both, n_both, x[i%2], y[i%2])) {
+			if (n_both >= cap_both - 1) {
+				cap_both *= 2;
+				both = realloc_or_die(both, cap_both * 2);
+			}
+			both[n_both * 2] = x[i%2];
+			both[n_both * 2 + 1] = y[i%2];
+			n_both++;
+		}
+		i++;
 	}
-	free(visited);
-	printf("Day 3, part 1: %d\n", n_visited);
+	free(santa);
+	free(both);
+	printf("Day 3, part 1: %d\n", n_santa);
+	printf("Day 3, part 2: %d\n", n_both);
 }
 
