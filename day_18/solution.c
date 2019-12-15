@@ -40,6 +40,18 @@ void update(Grid *old, Grid *new) {
 	}
 }
 
+void update2(Grid *old, Grid *new) {
+	(*old)[0][0] = '#';
+	(*old)[0][N-1] = '#';
+	(*old)[N-1][0] = '#';
+	(*old)[N-1][N-1] = '#';
+	update(old, new);
+	(*new)[0][0] = '#';
+	(*new)[0][N-1] = '#';
+	(*new)[N-1][0] = '#';
+	(*new)[N-1][N-1] = '#';
+}
+
 void print_grid(Grid *g) {
 	for (int y = 0; y < N; y++) {
 		puts((*g)[y]);
@@ -59,6 +71,8 @@ int lights_on(Grid *g) {
 int main() {
 	Grid grid = {};
 	Grid swap = {};
+	Grid grid2 = {};
+	Grid swap2 = {};
 	for (int i = 0; i < N; i++) {
 		if (read(STDIN_FILENO, grid[i], N+1) < N+(i < N-1)) {
 			fprintf(stderr, "error reading input at line %d\n", i+1);
@@ -69,12 +83,21 @@ int main() {
 	int step = 0;
 	Grid *current = &grid;
 	Grid *next = &swap;
-	for (; step < 100; step++) {
-		update(current, next);
+	Grid *current2 = &grid2;
+	Grid *next2 = &swap2;
+	update(current, next);
+	update2(current, next2);
+	for (; step < 100-1; step++) {
 		Grid *temp = current;
 		current = next;
 		next = temp;
+		temp = current2;
+		current2 = next2;
+		next2 = temp;
+		update(current, next);
+		update2(current2, next2);
 	}
-	printf("Day 18, part 1: %d\n", lights_on(current));
+	printf("Day 18, part 1: %d\n", lights_on(next));
+	printf("Day 18, part 2: %d\n", lights_on(next2));
 }
 
