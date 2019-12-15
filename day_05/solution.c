@@ -32,11 +32,44 @@ int is_nice(char *s) {
 	}
 }
 
+/*
+ * Now, a nice string is one with all of the following properties:
+ *
+ *     It contains a pair of any two letters that appears at least twice in the
+ *     string without overlapping, like xyxy (xy) or aabcdefgaa (aa), but not
+ *     like aaa (aa, but it overlaps).  It contains at least one letter which
+ *     repeats with exactly one letter between them, like xyx, abcdefeghi
+ *     (efe), or even aaa.
+ */
+
+int check_pair(char *pair, char *rest) {
+	for (int i = 0; rest[i] != '\0' && rest[i] != '\n'; i++) {
+		if (pair[1] == rest[i] && pair[0] == rest[i-1])
+			return 1;
+	}
+	return 0;
+}
+
+int is_nice2(char *s) {
+	int repeat = 0;
+	int pair = 0;
+	for (int i = 0; s[i] != '\0' && s[i] != '\n'; i++) {
+		if (!repeat && i > 1 && s[i-2] == s[i]) repeat = 1;
+		if (!pair && i > 2 && check_pair(&s[i-3], &s[i])) pair = 1;
+		if (repeat && pair) return 1;
+	}
+	return 0;
+}
+
 int main() {
 	int nice = 0;
+	int nice2 = 0;
 	char buf[256];
-	while (fgets(buf, sizeof(buf), stdin))
+	while (fgets(buf, sizeof(buf), stdin)) {
 		nice += is_nice(buf);
+		nice2 += is_nice2(buf);
+	}
 	printf("Day 5, part 1: %d\n", nice);
+	printf("Day 5, part 2: %d\n", nice2);
 }
 
