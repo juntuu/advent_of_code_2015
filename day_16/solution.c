@@ -54,6 +54,29 @@ int match(int *m, int *a) {
 	return 1;
 }
 
+int match2(int *m, int *a) {
+	for (int n = 0; n < N; n++) {
+		if (a[n] < 0) continue;
+		switch (n) {
+			case cats:
+			case trees:
+				if (a[n] <= m[n])
+					return 0;
+				break;
+			case goldfish:
+			case pomeranians:
+				if (a[n] >= m[n])
+					return 0;
+				break;
+			default:
+				if (a[n] != m[n])
+					return 0;
+				break;
+		}
+	}
+	return 1;
+}
+
 /*
  * children: 3
  * cats: 7
@@ -70,15 +93,24 @@ int match(int *m, int *a) {
 int main() {
 	int sample[] = {3, 7, 2, 3, 0, 0, 5, 3, 2, 1};
 	int sue[N];
-	int matching = 0;
+	int matching[2] = {};
 	for (int i = 1;; i++) {
 		for (int n = 0; n < N; n++)
 			sue[n] = -1;
 		if (parse_aunt(stdin, sue))
 			break;
-		if (match(sample, sue))
-			matching = i;
+		if (match(sample, sue)) {
+			matching[0] = i;
+			if (matching[1])
+				break;
+		}
+		if (match2(sample, sue)) {
+			matching[1] = i;
+			if (matching[0])
+				break;
+		}
 	}
-	printf("Day 16, part 1: %d\n", matching);
+	printf("Day 16, part 1: %d\n", matching[0]);
+	printf("Day 16, part 2: %d\n", matching[1]);
 }
 
