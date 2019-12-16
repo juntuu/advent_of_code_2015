@@ -1,8 +1,27 @@
 
 #include <stdio.h>
 
-int json_sum(FILE *f) {
+int is_red(FILE *f) {
+	char ref[] = "asd";
+	int c;
+	int i = 0;
+	while ((c = getc(f)) != '"') {
+		if (i < 3) ref[i] = c;
+		i++;
+	}
+	int res = i == 3 && ref[0] == 'r' && ref[1] == 'e' && ref[2] == 'd';
+	return res;
+}
+
+typedef struct {
+	int sum;
+	int red;
+} Result;
+
+Result json_sum(FILE *f) {
+	Result res;
 	int sum = 0;
+	int red = 0;
 	int num = 0;
 	int sign = 1;
 	int c;
@@ -20,20 +39,32 @@ int json_sum(FILE *f) {
 			sign = 1;
 		}
 		switch (c) {
-			case '{': sum += json_sum(f); break;
-			case '[': sum += json_sum(f); break;
-			case '"': while (getc(f) != '"') ; break;
-			case ']': return sum;
-			case '}': return sum;
+			case '{':
+			case '[':
+				res = json_sum(f);
+				sum += res.sum;
+				red += res.red;
+				break;
+			case '"':
+				if (is_red(f) && last == ':') {
+					res = json_sum(f);
+					res.red += res.sum + sum + red;
+					res.sum = 0;
+					return res;
+				}
+				break;
+			case ']':
+			case '}': return (Result) {sum, red};
 			case '-': sign = -1; break;
 		}
 		last = c;
 	}
-	return sum + num * sign;
+	return (Result) {sum + num * sign, red};
 }
 
 int main() {
-	int sum = json_sum(stdin);
-	printf("Day 12, part 1: %d\n", sum);
+	Result res = json_sum(stdin);
+	printf("Day 12, part 1: %d\n", res.sum + res.red);
+	printf("Day 12, part 2: %d\n", res.sum);
 }
 
