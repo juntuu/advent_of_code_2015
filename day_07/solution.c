@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 enum {
 	DONE = 0,
@@ -117,7 +118,8 @@ int main(int argc, char **argv) {
 		}
 	}
 	Wire *wires = calloc(N * N, sizeof(Wire));
-	if (!wires) {
+	Wire *copy = malloc(N * N * sizeof(Wire));
+	if (!wires || !copy) {
 		perror("allocating");
 		fclose(f);
 		return 1;
@@ -125,7 +127,18 @@ int main(int argc, char **argv) {
 	parse(f, wires);
 	fclose(f);
 
-	int res = solve(hash("a"), wires);
+	memcpy(copy, wires, N * N * sizeof(Wire));
+
+	uint16_t res = solve(hash("a"), wires);
 	printf("Day 7, part 1: %d\n", res);
+	free(wires);
+
+	Wire *b = &copy[hash("b")];
+	b->gate = DONE;
+	b->a = res;
+
+	res = solve(hash("a"), copy);
+	printf("Day 7, part 2: %d\n", res);
+	free(copy);
 }
 
