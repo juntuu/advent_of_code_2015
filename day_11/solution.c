@@ -76,5 +76,8 @@ int main(int argc, char **argv) {
 
 	password = next_password(password);
 	printf("Day 11, part 1: %s\n", password);
+
+	password = next_password(password);
+	printf("Day 11, part 2: %s\n", password);
 }
 
