@@ -104,6 +104,11 @@ int main() {
 	run(instr, n, &reg);
 	printf("Day 23, part 1: %u\n", reg.b);
 
+	reg.a = 1;
+	reg.b = 0;
+	run(instr, n, &reg);
+	printf("Day 23, part 1: %u\n", reg.b);
+
 	free(instr);
 }
 
