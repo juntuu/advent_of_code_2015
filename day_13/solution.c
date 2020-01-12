@@ -29,11 +29,15 @@ int next_permutation(int *array, int n) {
 	return 1;
 }
 
-int seating_score(int *scores, int *order, int size) {
+int seating_score(int *scores, int *order, int size, int skip) {
 	int total = 0;
-	for (int i = 0; i < size; i++) {
-		total += scores[order[i] * size + order[(i+1)%size]];
-		total += scores[order[(i+1)%size] * size + order[i]];
+	for (int i = 0; i < size+skip; i++) {
+		int a = order[i];
+		int b = order[(i+1)%(size+skip)];
+		if (a == size || b == size)
+			continue;
+		total += scores[a * size + b];
+		total += scores[b * size + a];
 	}
 	return total;
 }
@@ -52,8 +56,9 @@ int main(int argc, char **argv) {
 			return 1;
 		}
 	}
+
 	int *scores = calloc(n * n, sizeof(int));
-	int *order = malloc(n * sizeof(int));
+	int *order = malloc((n+1) * sizeof(int));
 	if (!scores || !order) {
 		fprintf(stderr, "couldn't allocate\n");
 		return 1;
@@ -74,15 +79,23 @@ int main(int argc, char **argv) {
 	}
 
 	first_permutation(order, n);
-
-	int score = seating_score(scores, order, n);
-
+	int score = seating_score(scores, order, n, 0);
 	while (next_permutation(order, n)) {
-		int d = seating_score(scores, order, n);
+		int d = seating_score(scores, order, n, 0);
 		if (d > score) score = d;
 	}
 
 	printf("Day 13, part 1: %d\n", score);
+
+
+	first_permutation(order, n+1);
+	score = seating_score(scores, order, n, 1);
+	while (next_permutation(order, n+1)) {
+		int d = seating_score(scores, order, n, 1);
+		if (d > score) score = d;
+	}
+
+	printf("Day 13, part 2: %d\n", score);
 
 	free(scores);
 	free(order);
