@@ -70,13 +70,16 @@ int main(int argc, char **argv) {
 	first_permutation(order, n);
 
 	int shortest = journey_distance(distances, order, n);
+	int longest = shortest;
 
 	while (next_permutation(order, n)) {
 		int d = journey_distance(distances, order, n);
 		if (d < shortest) shortest = d;
+		if (d > longest) longest = d;
 	}
 
 	printf("Day 9, part 1: %d\n", shortest);
+	printf("Day 9, part 2: %d\n", longest);
 
 	free(distances);
 	free(order);
