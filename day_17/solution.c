@@ -7,10 +7,12 @@ typedef struct List {
 	struct List *next;
 } List;
 
-int combinations(List *xs, int total, int res) {
-	if (!xs || total < 0)
+int combinations(List *xs, int total, int res, int in_use, int *hist) {
+	if (!xs || total < 0) {
+		if (in_use) hist[in_use-1] += (total == 0);
 		return res + (total == 0);
-	return combinations(xs->next, total, combinations(xs->next, total-xs->x, res));
+	}
+	return combinations(xs->next, total, combinations(xs->next, total-xs->x, res, in_use+1, hist), in_use, hist);
 }
 
 int main(int argc, char **argv) {
@@ -23,6 +25,7 @@ int main(int argc, char **argv) {
 	}
 	List containers;
 	int x;
+	int n = 0;
 	for (List *i = &containers, *last = NULL;; i = i->next) {
 		if (scanf("%d", &x) != 1) {
 			if (last) last->next = NULL;
@@ -36,9 +39,21 @@ int main(int argc, char **argv) {
 		}
 		i->x = x;
 		last = i;
+		n++;
 	}
 
-	int n = combinations(&containers, eggnog, 0);
-	printf("Day 17, part 1: %d\n", n);
+	int *ns = calloc(n, sizeof(int));
+	if (!ns) {
+		perror("allocating");
+		return 1;
+	}
+
+	int total = combinations(&containers, eggnog, 0, 0, ns);
+	int least = 0;
+	for (int i = 0; i < n && !least; i++)
+		least = ns[i];
+
+	printf("Day 17, part 1: %d\n", total);
+	printf("Day 17, part 2: %d\n", least);
 }
 
