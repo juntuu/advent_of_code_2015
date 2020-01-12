@@ -22,6 +22,8 @@ typedef struct CallBack {
 	void (*call)(struct CallBack*, void *);
 	List *ingredients;
 	int *best;
+	int calories;
+	int *best_with_calories;
 } CallBack;
 
 int read_ingredient(FILE *f, Ingredient *i) {
@@ -35,8 +37,9 @@ int read_ingredient(FILE *f, Ingredient *i) {
 			&i->calories);
 }
 
-int score(List *ingredients, List *k) {
-	int s = 1;
+typedef struct { int score; int calories; } Score;
+Score score(List *ingredients, List *k) {
+	Score s = {1, 0};
 	int total[4] = {0, 0, 0, 0};
 	while (k) {
 		Ingredient *i = ingredients->data;
@@ -44,15 +47,17 @@ int score(List *ingredients, List *k) {
 		total[1] += k->x * i->durability;
 		total[2] += k->x * i->flavor;
 		total[3] += k->x * i->texture;
+		s.calories += k->x * i->calories;
 		k = k->next;
 		ingredients = ingredients->next;
 	}
 
 	for (int i = 0; i < 4; i++) {
 		if (total[i] < 0) {
-			return 0;
+			s.score = 0;
+			break;
 		}
-		s *= total[i];
+		s.score *= total[i];
 	}
 	return s;
 }
@@ -70,9 +75,11 @@ void for_each_combination(int n, int total, List *xs, CallBack *cb) {
 }
 
 void improve_score(CallBack *cb, void *k) {
-	int s = score(cb->ingredients, k);
-	if (s > *cb->best)
-		*cb->best = s;
+	Score s = score(cb->ingredients, k);
+	if (s.score > *cb->best)
+		*cb->best = s.score;
+	if (s.score > *cb->best_with_calories && s.calories == cb->calories)
+		*cb->best_with_calories = s.score;
 }
 
 int main() {
@@ -91,14 +98,18 @@ int main() {
 	}
 
 	int best = 0;
+	int best_with_calories = 0;
 	CallBack cb = {
 		improve_score,
 		&ingredients,
 		&best,
+		500,
+		&best_with_calories,
 	};
 
 	for_each_combination(n, 100, NULL, &cb);
 
 	printf("Day 15, part 1: %d\n", best);
+	printf("Day 15, part 2: %d\n", best_with_calories);
 }
 
