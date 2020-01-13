@@ -44,6 +44,7 @@ typedef struct CallBack {
 	Player *p;
 	Player *e;
 	int *best;
+	int *worst;
 } CallBack;
 
 void for_each_combination(int n, List *total, List *xs, CallBack *cb) {
@@ -81,8 +82,13 @@ void try_play(CallBack *c, void *l) {
 	if (items->next->x && items->next->x != items->x)
 		gold += equip_with(&p, &i[items->next->x - 1]);
 
-	if (play(p, *c->e) == 0 && gold < *c->best)
-		*c->best = gold;
+	if (play(p, *c->e) == 0) {
+		if (gold < *c->best)
+			*c->best = gold;
+	} else {
+		if (gold > *c->worst)
+			*c->worst = gold;
+	}
 }
 
 int main() {
@@ -99,11 +105,13 @@ int main() {
 	}
 
 	int min_gold = 1000;
+	int max_gold = 0;
 	CallBack cb = {
 		try_play,
 		&player,
 		&boss,
 		&min_gold,
+		&max_gold,
 	};
 	List totals[] = {
 		{6, &totals[1]},
@@ -114,5 +122,6 @@ int main() {
 	for_each_combination(4, totals, NULL, &cb);
 
 	printf("Day 21, part 1: %d\n", min_gold);
+	printf("Day 21, part 2: %d\n", max_gold);
 }
 
