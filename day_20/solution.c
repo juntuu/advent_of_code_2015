@@ -67,6 +67,13 @@ int factor_sum(int n) {
 	return sum;
 }
 
+int factor_sum_up_to(int n, int max) {
+	int sum = 0;
+	for (int i = 1; i < max; i++)
+		if (n % i == 0) sum += i;
+	return sum;
+}
+
 int main() {
 	int input = 34000000;
 	int got = 0;
@@ -76,5 +83,13 @@ int main() {
 		got = 10 * factor_sum(house);
 	} while (got < input);
 	printf("Day 20, part 1: %d\n", house);
+
+	do {
+		house++;
+		got = factor_sum(house);
+		got -= factor_sum_up_to(house, house/50);
+		got *= 11;
+	} while (got < input);
+	printf("Day 20, part 2: %d\n", house);
 }
 
