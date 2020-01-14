@@ -69,8 +69,8 @@ int main() {
 		packages[n++] = x;
 	}
 
-	if (total % 3 != 0) {
-		fprintf(stderr, "the sum of packages must be divisible by 3\n");
+	if (total % (3*4) != 0) {
+		fprintf(stderr, "the sum of packages must be divisible by 3 and 4\n");
 		return 1;
 	}
 
@@ -84,5 +84,10 @@ int main() {
 
 	for_each_combination(total / 3, packages, n, 0, &best_len, NULL, &cb);
 	printf("Day 24, part 1: %lu\n", best);
+
+	best = -1;
+	best_len = n;
+	for_each_combination(total / 4, packages, n, 0, &best_len, NULL, &cb);
+	printf("Day 24, part 2: %lu\n", best);
 }
 
