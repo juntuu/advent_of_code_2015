@@ -74,6 +74,25 @@ int replacements(char *m, int n, Replacement *r, int rn, Trie *t) {
 	return uniq;
 }
 
+int steps(char *m) {
+	/* From: /r/adventofcode/comments/3xflz8/day_19_solutions/
+	 * comment by: u/askalski
+	 *
+	 * count(tokens) - count("(" or ")") - 2*count(",") - 1
+	 */
+	int res = -1;
+	for (; *m; m++) {
+		if (*m > 'Z') continue;
+		switch (*m) {
+			case 'Y': res--; break;
+			case 'R': break;
+			case 'A': if (m[1] == 'r') break;
+			default: res++;
+		}
+	}
+	return res;
+}
+
 int main() {
 	int cap = 32;
 	int n = 0;
@@ -115,5 +134,6 @@ int main() {
 	int count = replacements(molecule, len, rs, n, t);
 
 	printf("Day 19, part 1: %d\n", count);
+	printf("Day 19, part 2: %d\n", steps(molecule));
 }
 
