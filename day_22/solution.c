@@ -167,8 +167,11 @@ void print_moves(int spent)
 	printf("\n");
 }
 
-int play(Wizard w, Boss b, int spent, int limit)
+int play(Wizard w, Boss b, int penalty, int spent, int limit)
 {
+	w.hp -= penalty;
+	if (w.hp < 1)
+		return 0;
 	if (apply_effects(&w, &b)) {
 		if (VERBOSE)
 			print_moves(spent);
@@ -191,7 +194,7 @@ int play(Wizard w, Boss b, int spent, int limit)
 			if (VERBOSE)
 				print_moves(best);
 		} else if (!boss_attack(&w1, &b1)) {
-			int res = play(w1, b1, spent + cost, best);
+			int res = play(w1, b1, penalty, spent + cost, best);
 			if (res)
 				best = res;
 		}
@@ -222,5 +225,6 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	printf("Day 22, part 1: %d\n", play(player, boss, 0, INT_MAX));
+	printf("Day 22, part 1: %d\n", play(player, boss, 0, 0, INT_MAX));
+	printf("Day 22, part 2: %d\n", play(player, boss, 1, 0, INT_MAX));
 }
