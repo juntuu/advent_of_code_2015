@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 int find(int x, int *xs, int n) {
 	if (n < 1) return -1;
@@ -67,30 +68,68 @@ int factor_sum(int n) {
 	return sum;
 }
 
-int factor_sum_up_to(int n, int max) {
-	int sum = 0;
-	for (int i = 1; i < max; i++)
-		if (n % i == 0) sum += i;
-	return sum;
+int robins_inequality(int x) {
+	double n = x;
+	return exp(0.57721566490153286060651209008240243104215933593992) * n * log(log(n));
+}
+
+int find_starting_point(int target) {
+
+	int lo = 5040;
+	int hi = target;
+	while (lo < hi) {
+		int mid = (lo + hi) / 2;
+		int val = robins_inequality(mid);
+		if (val < target)
+			lo = mid + 1;
+		else if (val > target)
+			hi = mid;
+	}
+	return lo;
+}
+
+int p2(int target, int start) {
+	const int MULTIPLIER = 11;
+	const int STEPS = 50;
+	int N = target / MULTIPLIER;
+	int *house = calloc(N-start, sizeof(*house));
+	if (!house) {
+		perror("allocating houses");
+		exit(1);
+	}
+
+	int found = target;
+	for (int i = start / STEPS; i <= N; i++) {
+		int j = i;
+		int steps = STEPS;
+		if (j <= start) {
+			int times = 1 + (start - j) / i;
+			j += i * times;
+			steps -= times;
+		}
+		for (; steps && j <= N; j += i, steps--) {
+			if ((house[j-1-start] += i * MULTIPLIER) >= target && j < found) {
+				N = j;
+				found = j;
+			}
+		}
+	}
+	free(house);
+	return found;
 }
 
 int main() {
 	int input = 34000000;
 	int got = 0;
-	int house = 0;
+	int house = find_starting_point(input / 10);
 	do {
 		house++;
 		got = 10 * factor_sum(house);
 	} while (got < input);
+
 	printf("Day 20, part 1: %d\n", house);
 
-	house *= 1.05; /* dirty hack to get the second part a bit faster */
-	do {
-		house++;
-		got = factor_sum(house);
-		got -= factor_sum_up_to(house, house/50);
-		got *= 11;
-	} while (got < input);
+	house = p2(input, house);
 	printf("Day 20, part 2: %d\n", house);
 }
 
