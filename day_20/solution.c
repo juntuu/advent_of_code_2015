@@ -84,6 +84,7 @@ int main() {
 	} while (got < input);
 	printf("Day 20, part 1: %d\n", house);
 
+	house *= 1.05; /* dirty hack to get the second part a bit faster */
 	do {
 		house++;
 		got = factor_sum(house);
