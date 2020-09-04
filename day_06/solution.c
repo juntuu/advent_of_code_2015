@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -13,31 +12,30 @@ enum {
 } Grid;
 
 void set_lights(char *grid, int mode, int x0, int y0, int x1, int y1) {
-	for (int j = y0; j <= y1; j++) {
-		int base = j * SIZE;
-		for (int i = x0; i <= x1; i++) {
-			switch (mode) {
-				case TOGGLE:
-					grid[base + i] ^= 1;
-					break;
-				case OFF:
-					grid[base + i] = 0;
-					break;
-				case ON:
-					grid[base + i] = 1;
-					break;
-				case PLUS2:
-					grid[base + i] += 2;
-					break;
-				case DECR:
-					if (grid[base + i])
-						grid[base + i]--;
-					break;
-				case INCR:
-					grid[base + i]++;
-					break;
-			}
+#define DO(...) for (int j = y0; j <= y1; j++) { \
+			int base = j * SIZE; \
+			for (int i = base + x0; i <= base + x1; i++) \
+				__VA_ARGS__; \
 		}
+	switch (mode) {
+		case TOGGLE:
+			DO(grid[i] ^= 1);
+			break;
+		case OFF:
+			DO(grid[i] = 0);
+			break;
+		case ON:
+			DO(grid[i] = 1);
+			break;
+		case PLUS2:
+			DO(grid[i] += 2);
+			break;
+		case DECR:
+			DO(grid[i] && grid[i]--);
+			break;
+		case INCR:
+			DO(grid[i]++);
+			break;
 	}
 }
 
@@ -65,4 +63,3 @@ int main() {
 	free(grid);
 	free(grid2);
 }
-
