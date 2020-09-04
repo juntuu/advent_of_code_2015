@@ -29,9 +29,10 @@ int main(int argc, char **argv) {
 	char *out = malloc(cap * 2);
 	if (!in || !out) return 1;
 	strcpy(in, input);
+	int res = strlen(in);
 	for (int i = 0; i < 50; i++) {
-		if (i == 40) printf("Day 10, part 1: %lu\n", strlen(in));
-		if (rle(in, out) > cap) {
+		if (i == 40) printf("Day 10, part 1: %d\n", res);
+		if ((res = rle(in, out)) > cap) {
 			cap *= 2;
 			in = realloc(in, cap * 2);
 			out = realloc(out, cap * 2);
@@ -44,7 +45,7 @@ int main(int argc, char **argv) {
 		in = out;
 		out = temp;
 	}
-	printf("Day 10, part 2: %lu\n", strlen(in));
+	printf("Day 10, part 2: %d\n", res);
 	free(in);
 	free(out);
 }
